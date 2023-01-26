@@ -1,0 +1,129 @@
+names = { 
+	"Alberta",
+	"Alicia",
+	"Annabelle",
+	"Augustine",
+	"Ava",
+	"Beverly",
+	"Brittney",
+	"Brock",
+	"Buck",
+	"Cathryn",
+	"Cleo",
+	"Colton",
+	"Dave",
+	"Deena",
+	"Deloris",
+	"Dennis",
+	"Earline",
+	"Emery",
+	"Emily",
+	"Erich",
+	"Felicia",
+	"Francesca",
+	"Fred",
+	"Garfield",
+	"Garry",
+	"Grover",
+	"Hayden",
+	"Ismael",
+	"Iva",
+	"Jolene",
+	"Kathie",
+	"Katie",
+	"Laurel",
+	"Leigh",
+	"Leigh",
+	"Maria",
+	"Melisa",
+	"Merlin",
+	"Minnie",
+	"Mitchell",
+	"Mohamed",
+	"Myrna",
+	"Omar",
+	"Riley",
+	"Rochelle",
+	"Sabrina",
+	"Shannon",
+	"Sonja",
+	"Vicki",
+	"Walton"
+}
+
+function init(self)
+	local colors = { "gold", "blue", "pink", "brown", "gray", "red" }
+	
+	self.frog_name = table.remove(names, math.random(#names))
+	self.color = colors[math.random(#colors)]
+	change_animation(self.color .. "_frog_idle")
+	self.is_racing = false
+	self.is_finished = false
+	self.is_stoppable = true
+	self.stamina = math.random(30)
+	self.timer = 0
+
+	go.set("#sprite", "scale", vmath.vector3(3))
+	label.set_text("#frog_name", self.frog_name)
+end
+
+function finish_racing(self, did_not_finish)
+	self.is_racing = false
+	msg.post("/go", hash("frog_finished"), { did_not_finish = did_not_finish })
+	change_animation(self.color .. "_frog_" .. (did_not_finish and "idle" or "win"))
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start_race") then
+		self.is_racing = true
+		label.set_text("#frog_name", "")
+	end
+
+	if message_id == hash("results") and not self.is_finished then
+		self.is_finished = true
+		label.set_text("#placing", message.position)
+		label.set_text("#placing_frog_name", self.frog_name)
+		if message.position == "4th" then
+			msg.post("/start_button#start_button", hash("race_complete"))
+		end
+	end
+
+	if message_id == hash("did_not_finish") and self.is_racing then
+		finish_racing(self, true)
+	end
+end
+
+function change_animation(animation_string)
+	if go.get("#sprite", "animation") ~= hash(animation_string) then
+		sprite.play_flipbook("#sprite", animation_string)
+	end
+end
+
+function fixed_update(self, dt)
+	if go.get("/go#main", "is_race_started") and self.timer > 0 and not self.is_finished then
+		self.timer = self.timer - dt
+		if self.timer <= 0 then
+			self.is_racing = true
+		end
+	elseif self.is_racing and math.random(self.stamina) == 1 and self.is_stoppable then
+		self.timer = math.random(2)
+		self.is_racing = false
+		self.is_stoppable = false
+		self.stoppable_timer = timer.delay(self.timer + 1, false, function (self, handle, time_elapsed) self.is_stoppable = true end)
+		change_animation(self.color .. "_frog_idle")
+	end
+	
+	if self.is_racing then
+		local start = go.get_position()
+		if not self.dest then
+			self.dest = vmath.vector3(-200, 0, 0)
+		end
+			
+		if go.get_position().x <= 95 then
+			finish_racing(self)
+		else
+			go.set_position(start + self.dest * dt)
+			change_animation(self.color .. "_frog_hop")
+		end
+	end
+end

@@ -1,0 +1,44 @@
+go.property("number_of_finished_frogs", 0)
+go.property("is_race_started", false)
+
+math.randomseed(os.time())
+for _ = 1, 3 do	math.random() end
+
+places = { "1st", "2nd", "3rd", "4th" }
+
+function init(self)
+	sound.play("/go#music")
+	msg.post("@render:", "use_fixed_projection", { near = -1, far = 1 })
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start_race") then
+		self.is_race_started = true
+		self.timer = 30
+		for index = 1, 4 do
+			msg.post("frog" .. index, message_id)
+		end
+	end
+
+	if message_id == hash("frog_finished") then
+		self.number_of_finished_frogs = self.number_of_finished_frogs + 1
+		msg.post(sender, hash("results"), { position = places[self.number_of_finished_frogs] })
+	end
+end
+
+function fixed_update(self, dt)
+	if self.timer and self.timer > 0 then
+		msg.post("/start_button#start_button", hash("update_timer"), { timer = math.floor(self.timer) })
+		self.timer = self.timer - dt
+		if self.timer <= 0 then
+			local placings = {}
+			for index = 1, 4 do
+				table.insert(placings, { index = index, position = go.get_position("/frog" .. index).x })
+			end
+			table.sort(placings, function (item1, item2) return item1.position < item2.position end)
+			for index, placing in ipairs(placings) do
+				msg.post("/frog" .. placing.index, "results", { position = places[index] })
+			end
+		end
+	end
+end

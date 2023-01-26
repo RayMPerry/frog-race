@@ -1,0 +1,29 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("click") and action.pressed then
+		local box = gui.get_node("box")
+		local text = gui.get_node("text")
+		local timer_node = gui.get_node("timer")
+		if gui.pick_node(box, action.x, action.y) then
+			msg.post("/go", hash("start_race"))
+			gui.set_visible(timer_node, true)
+			gui.set_enabled(box, false)
+			gui.set_enabled(text, false)
+		end
+	end
+end
+
+function on_message(self, message_id, message)
+	if message_id == hash("update_timer") then
+		local timer_node = gui.get_node("timer")
+		gui.set_text(timer_node, message.timer)
+	end
+
+	if message_id == hash("race_complete") then
+		local timer_node = gui.get_node("timer")
+		gui.set_visible(timer_node, false)
+	end
+end	
