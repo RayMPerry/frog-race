@@ -85,8 +85,8 @@ embedded_components {
   id: "frog_name"
   type: "label"
   data: "size {\n"
-  "  x: 128.0\n"
-  "  y: 128.0\n"
+  "  x: 192.0\n"
+  "  y: 96.0\n"
   "  z: 0.0\n"
   "  w: 0.0\n"
   "}\n"
@@ -112,13 +112,13 @@ embedded_components {
   "tracking: 0.0\n"
   "pivot: PIVOT_CENTER\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
-  "line_break: false\n"
+  "line_break: true\n"
   "text: \"\"\n"
   "font: \"/assets/fonts/PublicPixel.font\"\n"
   "material: \"/builtins/fonts/label.material\"\n"
   ""
   position {
-    x: -119.0
+    x: -133.0
     y: 0.0
     z: 0.0
   }
@@ -133,8 +133,8 @@ embedded_components {
   id: "placing_frog_name"
   type: "label"
   data: "size {\n"
-  "  x: 128.0\n"
-  "  y: 128.0\n"
+  "  x: 192.0\n"
+  "  y: 96.0\n"
   "  z: 0.0\n"
   "  w: 0.0\n"
   "}\n"
@@ -160,13 +160,13 @@ embedded_components {
   "tracking: 0.0\n"
   "pivot: PIVOT_CENTER\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
-  "line_break: false\n"
+  "line_break: true\n"
   "text: \"\"\n"
   "font: \"/assets/fonts/PublicPixel.font\"\n"
   "material: \"/builtins/fonts/label.material\"\n"
   ""
   position {
-    x: 192.0
+    x: 217.0
     y: 0.0
     z: 0.0
   }
