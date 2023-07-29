@@ -1,6 +1,8 @@
 [project]
 title = Frog Race
 developer = RaycatWhoDat
+custom_resources = /game/entities/frog/frog_stats.json
+dependencies#0 = https://github.com/subsoap/deffx/archive/master.zip
 
 [bootstrap]
 main_collection = /game/scenes/main/main.collectionc
@@ -32,4 +34,7 @@ scale = 0.01
 [graphics]
 default_texture_min_filter = nearest
 default_texture_mag_filter = nearest
+
+[sprite]
+subpixels = 1
 

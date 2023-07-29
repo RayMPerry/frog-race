@@ -6,8 +6,28 @@ for _ = 1, 3 do	math.random() end
 
 places = { "1st", "2nd", "3rd", "4th" }
 
+-- DEBUG_NAME = "Mike Haggar"
+
+if not STATS then
+	local data, error = sys.load_resource("/game/entities/frog/frog_stats.json")
+	if data then
+		NAMES = {}
+		STATS = json.decode(data)
+		for name, _ in pairs(STATS) do
+			table.insert(NAMES, name)
+			if name == DEBUG_NAME then DEBUG_ID = #NAMES end 
+		end
+	else
+		print(error)
+	end
+end
+
 function init(self)
-	sound.play("/go#music")
+	if math.random(100) >= 98 then
+		sound.play("/go#music2")
+	else
+		sound.play("/go#music1")
+	end
 	msg.post("@render:", "use_fixed_projection", { near = -1, far = 1 })
 end
 

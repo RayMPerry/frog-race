@@ -1,67 +1,23 @@
-names = {
-	"Hannibal",
-	"Michigan",
-	"DETROIT",
-	"Dart",
-	"Bottas",
-	"Kermit",
-	"John TTS",
-	"Michael",
-	"Caesar",
-	"Horchata",
-	"Pallas",
-	"Etroit",
-	"Horse",
-	"Horse 2",
-	"HONSE",
-	"Scam Likely",
-	"Gravy Day",
-	"Mr. X",
-	"Testarotta",
-	"Kliff",
-	"Kierkeengard",
-	"Rick Drift",
-	"El Dandy",
-	"Evil Tennis King",
-	"Psymon",
-	"Leroooooooy",
-	"Horrible Sandwich Frog",
-	"Skrunkly Bingus",
-	"A Skeleton",
-	"E",
-	"Jazzy Jeff",
-	"Ribbitaroo Man",
-	"Three Tiny Raccoons in a Frog Suit",
-	"Joel",
-	"Dick Rich",
-	"Senna",
-	"Dog",
-	"Dog the Frog",
-	"Sir Hopsalot",
-	"Fred",
-	"Dovstoevsky",
-	"Pipo",
-	"Hassy",
-	"Galsia",
-	"John Frograce",
-	"Hylide",
-	"Minnesota Fats",
-	"Tofu",
-	"Todd",
-	"Slacker"
-}
-
 function init(self)
-	local colors = { "gold", "blue", "pink", "brown", "gray", "red" }
+	if DEBUG_ID then
+		self.frog_name = table.remove(NAMES, DEBUG_ID)
+		DEBUG_ID = nil
+	else
+		self.frog_name = table.remove(NAMES, math.random(#NAMES))
+	end
 	
-	self.frog_name = table.remove(names, math.random(#names))
-	self.color = colors[math.random(#colors)]
+	for key, value in pairs(STATS[self.frog_name]) do
+		self[key] = value
+	end
+
 	change_animation(self.color .. "_frog_idle")
+	
 	self.is_racing = false
 	self.is_finished = false
-	self.is_stoppable = true
-	self.stamina = math.random(30)
+	self.is_stoppable = false
+	self.stamina = self.stamina or math.random(30)
 	self.timer = 0
+	self.sauce = math.random(10)
 
 	go.set("#sprite", "scale", vmath.vector3(3))
 	label.set_text("#frog_name", self.frog_name)
@@ -76,6 +32,7 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start_race") then
 		self.is_racing = true
+		self.stoppable_timer = timer.delay(self.timer + 0.5, false, function (self, handle, time_elapsed) self.is_stoppable = true end)
 		label.set_text("#frog_name", "")
 	end
 
@@ -116,13 +73,18 @@ function fixed_update(self, dt)
 	if self.is_racing then
 		local start = go.get_position()
 		if not self.dest then
-			self.dest = vmath.vector3(-200, 0, 0)
+			self.dest = vmath.vector3(-200 - self.sauce, 0, 0)
 		end
 			
-		if go.get_position().x <= 95 then
+		if go.get_position().x <= 110 then
 			finish_racing(self)
 		else
-			go.set_position(start + self.dest * dt)
+			if self.frog_name == "Lagswitcher" then
+				self.dest = vmath.vector3(math.random(105, 2000), start.y, start.z)
+				go.set_position(self.dest)
+			else
+				go.set_position(start + self.dest * dt)
+			end
 			change_animation(self.color .. "_frog_hop")
 		end
 	end
